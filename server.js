@@ -1,6 +1,7 @@
 "use strict";
 
 const express = require("express");
+const helmet = require("helmet");
 const favicon = require("serve-favicon");
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -13,6 +14,7 @@ const http = require("http");
 const marked = require("marked");
 //const nosniff = require('dont-sniff-mimetype');
 const app = express(); // Web framework to handle routing requests
+app.use(helmet());
 const routes = require("./app/routes");
 const { port, db, cookieSecret } = require("./config/config"); // Application config properties
 /*
