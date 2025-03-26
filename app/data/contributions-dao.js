@@ -55,7 +55,7 @@ function ContributionsDAO(db) {
 
     this.getByUserId = (userId, callback) => {
         contributionsDB.findOne({
-                userId: userId
+                userId: String(userId)
             },
             (err, contributions) => {
                 if (err) return callback(err, null);
@@ -83,4 +83,4 @@ function ContributionsDAO(db) {
     };
 }
 
-module.exports = { ContributionsDAO };
+module.exports = { ContributionsDAO };
