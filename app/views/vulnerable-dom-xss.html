@@ -1,0 +1,56 @@
+{% extends "./layout.html" %}
+{% block title %}DOM XSS Demo{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">DOM-Based XSS Demo</h3>
+      </div>
+      <div class="panel-body">
+        <div class="alert alert-warning">
+          <strong>VULN: DOM-Based XSS (CWE-79)</strong><br>
+          The page reads <code>location.hash</code> and writes it directly to
+          <code>innerHTML</code>.  The payload never reaches the server — it
+          bypasses all server-side input validation and WAF rules.
+        </div>
+
+        <p>The page will display the URL fragment as a "welcome message".</p>
+        <p>Try: <code>/vulnerable/dom-xss#&lt;img src=x onerror=alert(document.cookie)&gt;</code></p>
+
+        <div id="welcome-msg" class="alert alert-info" style="display:none"></div>
+
+        <h4>Source of the vulnerability:</h4>
+        <pre style="background:#f5f5f5;padding:10px;border-radius:4px">
+// Vulnerable JavaScript — reads location.hash and writes raw HTML
+var fragment = decodeURIComponent(location.hash.slice(1));
+if (fragment) {
+    var el = document.getElementById('welcome-msg');
+    el.style.display = 'block';
+    el.innerHTML = 'Welcome: ' + fragment;  // ← sink
+}
+        </pre>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/*
+ * VULN: DOM-Based XSS (CWE-79)
+ * The URL fragment is written to innerHTML without any sanitisation.
+ * Exploit: /vulnerable/dom-xss#<img src=x onerror=alert(document.cookie)>
+ */
+(function () {
+    var fragment = decodeURIComponent(location.hash.slice(1));
+    if (fragment) {
+        var el = document.getElementById("welcome-msg");
+        el.style.display = "block";
+        el.innerHTML = "Welcome: " + fragment; // Sink — attacker controlled HTML inserted
+    }
+}());
+</script>
+
+{% endblock %}

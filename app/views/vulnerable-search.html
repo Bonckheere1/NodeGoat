@@ -1,0 +1,44 @@
+{% extends "./layout.html" %}
+{% block title %}Search Results{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Search Results</h3>
+      </div>
+      <div class="panel-body">
+
+        <form action="/vulnerable/search" method="get" role="search">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search..." name="q">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="submit">Go</button>
+            </span>
+          </div>
+        </form>
+
+        <hr>
+
+        <!--
+          VULN: Reflected XSS (CWE-79)
+          The query variable is rendered without escaping because Swig's
+          autoescape is globally disabled in server.js.
+
+          Exploit: ?q=<script>alert(document.cookie)</script>
+        -->
+        {% if query %}
+        <div class="alert alert-info">
+          Showing results for: <strong>{{ query }}</strong>
+          <!-- ^^^ Raw, unescaped output — XSS payload renders here -->
+        </div>
+        <p class="text-muted">No results found. Try a different search term.</p>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

