@@ -5,6 +5,7 @@ const ContributionsHandler = require("./contributions");
 const AllocationsHandler = require("./allocations");
 const MemosHandler = require("./memos");
 const ResearchHandler = require("./research");
+const VulnerableHandler = require("./vulnerable");
 const tutorialRouter = require("./tutorial");
 const ErrorHandler = require("./error").errorHandler;
 
@@ -19,6 +20,7 @@ const index = (app, db) => {
     const allocationsHandler = new AllocationsHandler(db);
     const memosHandler = new MemosHandler(db);
     const researchHandler = new ResearchHandler(db);
+    const vulnerableHandler = new VulnerableHandler(db);
 
     // Middleware to check if a user is logged in
     const isLoggedIn = sessionHandler.isLoggedInMiddleware;
@@ -77,6 +79,77 @@ const index = (app, db) => {
 
     // Mount tutorial router
     app.use("/tutorial", tutorialRouter);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // VULNERABLE LAB ROUTES  (educational / security-testing purposes only)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Main demo page
+    app.get("/vulnerable", isLoggedIn, vulnerableHandler.displayVulnerablePage);
+
+    // 1. Broken Access Control — BOLA / IDOR
+    app.get("/vulnerable/user/:userId",     isLoggedIn, vulnerableHandler.getUserById);
+    app.get("/vulnerable/document/:docId",  isLoggedIn, vulnerableHandler.getDocument);
+    app.put("/vulnerable/account/:userId",  isLoggedIn, vulnerableHandler.updateAccount);
+    app.get("/vulnerable/admin-panel",      isLoggedIn, vulnerableHandler.adminPanel); // Missing isAdmin
+
+    // 2. Business Logic & Validation
+    app.post("/vulnerable/checkout", isLoggedIn, vulnerableHandler.checkout);
+    app.post("/vulnerable/coupon",   isLoggedIn, vulnerableHandler.applyCoupon);
+    app.post("/vulnerable/transfer", isLoggedIn, vulnerableHandler.transfer);
+
+    // 3. Code & Command Injection
+    app.get("/vulnerable/ping",      isLoggedIn, vulnerableHandler.ping);
+    app.get("/vulnerable/eval",      isLoggedIn, vulnerableHandler.evalExpression);
+    app.post("/vulnerable/eval",     isLoggedIn, vulnerableHandler.evalExpression);
+    app.get("/vulnerable/file-info", isLoggedIn, vulnerableHandler.fileInfo);
+
+    // 4. NoSQL / Database Injection
+    app.post("/vulnerable/login-nosql",  vulnerableHandler.nosqlLogin);       // No auth required
+    app.get("/vulnerable/db-search",     isLoggedIn, vulnerableHandler.searchByField); // $where injection
+    app.get("/vulnerable/ldap",          isLoggedIn, vulnerableHandler.ldapSearch);
+
+    // 5. LLM & Prompt Injection
+    app.post("/vulnerable/ai/chat",      isLoggedIn, vulnerableHandler.aiChat);
+    app.post("/vulnerable/ai/review",    isLoggedIn, vulnerableHandler.aiReview);
+    app.post("/vulnerable/ai/summarize", isLoggedIn, vulnerableHandler.aiSummarize);
+
+    // 6. SSRF
+    app.get("/vulnerable/fetch",        isLoggedIn, vulnerableHandler.fetchUrl);
+    app.post("/vulnerable/webhook",     isLoggedIn, vulnerableHandler.sendWebhook);
+
+    // 7. Authentication & Session Management
+    app.get("/vulnerable/token/generate", isLoggedIn, vulnerableHandler.generateToken);
+    app.get("/vulnerable/token/verify",   vulnerableHandler.verifyToken);  // No auth — intentional
+    app.get("/vulnerable/reset-password", vulnerableHandler.resetPassword);
+    app.post("/vulnerable/brute-login",   vulnerableHandler.bruteLogin);
+
+    // 8. Client-Side Attacks (XSS, Open Redirect)
+    app.get("/vulnerable/search",       isLoggedIn, vulnerableHandler.searchPage);
+    app.post("/vulnerable/comment",     isLoggedIn, vulnerableHandler.addComment);
+    app.get("/vulnerable/comments",     isLoggedIn, vulnerableHandler.listComments);
+    app.get("/vulnerable/redirect",     isLoggedIn, vulnerableHandler.openRedirect);
+    app.get("/vulnerable/dom-xss",      isLoggedIn, vulnerableHandler.domXssPage);
+
+    // 9. Insecure Deserialization & SSTI
+    app.post("/vulnerable/preferences", isLoggedIn, vulnerableHandler.loadPreferences);
+    app.get("/vulnerable/template",     isLoggedIn, vulnerableHandler.renderTemplate);
+    app.post("/vulnerable/template",    isLoggedIn, vulnerableHandler.renderTemplate);
+
+    // 10. Files & Misconfigurations
+    app.get("/vulnerable/files/download", isLoggedIn, vulnerableHandler.downloadFile);
+    app.post("/vulnerable/files/upload",  isLoggedIn, vulnerableHandler.uploadFile);
+    app.get("/vulnerable/error",          isLoggedIn, vulnerableHandler.triggerError);
+
+    // 11. Secrets & Cryptography
+    app.get("/vulnerable/crypto/hash",  isLoggedIn, vulnerableHandler.hashData);
+    app.get("/vulnerable/crypto/ecb",   isLoggedIn, vulnerableHandler.ecbEncrypt);
+    app.post("/vulnerable/payment",     isLoggedIn, vulnerableHandler.processPayment);
+
+    // 12. Hardening
+    app.get("/vulnerable/cors-data",    isLoggedIn, vulnerableHandler.corsData);
+    app.post("/vulnerable/graphql",     vulnerableHandler.graphql);  // No auth — intentional
+    app.get("/vulnerable/no-headers",   isLoggedIn, vulnerableHandler.noSecurityHeaders);
 
     // Error handling middleware
     app.use(ErrorHandler);
