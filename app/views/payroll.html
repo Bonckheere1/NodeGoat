@@ -1,0 +1,82 @@
+{% extends "./layout.html" %} {% block title %}Payroll Reports{% endblock %} {% block content %}
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Employee Payroll Search</h3>
+            </div>
+            <div class="panel-body">
+
+                <!-- A1 - SQL Injection: search input is concatenated into raw SQL -->
+                <form action="/reports" method="get" role="search">
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control"
+                               name="name"
+                               placeholder="Search by employee name..."
+                               value="{{ searchName }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fa fa-search"></i> Search
+                            </button>
+                        </span>
+                    </div>
+                    <p class="help-block">
+                        <strong>Hint (A1 - SQL Injection):</strong>
+                        Try searching for <code>' OR '1'='1</code> to dump all records, or
+                        <code>' UNION SELECT id,username,password,salary,0 FROM users--</code>
+                        to exfiltrate the users table.
+                    </p>
+                </form>
+
+            </div>
+        </div>
+
+        {% if dbError %}
+        <div class="alert alert-danger">
+            <strong>Database Error:</strong> {{ dbError }}
+        </div>
+        {% endif %}
+
+        {% if employees %}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Results</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Salary</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for emp in employees %}
+                        <tr>
+                            <td>{{ emp.id }}</td>
+                            <td>{{ emp.name }}</td>
+                            <td>{{ emp.department }}</td>
+                            <td>${{ emp.salary }}</td>
+                            <td>
+                                <!-- A1 - numeric injection: id goes straight into SQL -->
+                                <a href="/reports/employee/{{ emp.id }}" class="btn btn-xs btn-info">
+                                    View Detail
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
