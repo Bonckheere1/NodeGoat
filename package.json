@@ -16,14 +16,27 @@
     "helmet": "^2.0.0",
     "marked": "0.3.5",
     "mongodb": "^2.1.18",
+    "sqlite3": "^5.1.6",
     "needle": "2.2.4",
     "node-esapi": "0.0.1",
     "serve-favicon": "^2.3.0",
     "swig": "^1.4.2",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "lodash": "4.17.4",
+    "minimist": "0.0.8",
+    "handlebars": "4.0.11",
+    "serialize-javascript": "2.1.1",
+    "node-uuid": "1.4.7"
   },
   "comments": {
-    "//": "a9 insecure components"
+    "//": "a9 insecure components",
+    "vulnerable-packages": {
+      "lodash@4.17.4": "CVE-2019-10744 - prototype pollution via _.defaultsDeep / _.merge / _.mergeWith",
+      "minimist@0.0.8": "CVE-2020-7598 - prototype pollution via --__proto__ CLI flag parsing",
+      "handlebars@4.0.11": "CVE-2019-20920 / CVE-2019-19919 - prototype pollution + RCE via template compilation",
+      "serialize-javascript@2.1.1": "CVE-2019-16769 - XSS via unescaped </script> in serialized regexes",
+      "node-uuid@1.4.7": "insecure random number generation; replaced by 'uuid' package"
+    }
   },
   "scripts": {
     "start": "node server.js",
