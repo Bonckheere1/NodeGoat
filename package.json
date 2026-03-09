@@ -21,11 +21,11 @@
     "node-esapi": "0.0.1",
     "serve-favicon": "^2.3.0",
     "swig": "^1.4.2",
-    "underscore": "^1.8.3",
-    "lodash": "4.17.4",
-    "minimist": "0.0.8",
-    "handlebars": "4.0.11",
-    "serialize-javascript": "2.1.1",
+    "underscore": "^1.13.8",
+    "lodash": "4.17.23",
+    "minimist": "0.2.4",
+    "handlebars": "4.7.7",
+    "serialize-javascript": "7.0.3",
     "node-uuid": "1.4.7"
   },
   "comments": {
