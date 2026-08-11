@@ -7,6 +7,7 @@ const MemosHandler = require("./memos");
 const ResearchHandler = require("./research");
 const ReportsHandler = require("./reports");
 const tutorialRouter = require("./tutorial");
+const apiRouter = require("./api");
 const ErrorHandler = require("./error").errorHandler;
 
 const index = (app, db) => {
@@ -83,6 +84,10 @@ const index = (app, db) => {
 
     // Mount tutorial router
     app.use("/tutorial", tutorialRouter);
+
+    // Vulnerability lab API - see app/routes/api.js and VULNERABILITY_LABS.md
+    // for the full list of intentionally insecure endpoints it exposes.
+    app.use("/api", apiRouter(db, isLoggedIn));
 
     // Error handling middleware
     app.use(ErrorHandler);
