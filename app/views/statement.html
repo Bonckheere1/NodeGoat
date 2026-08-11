@@ -1,0 +1,57 @@
+{% extends "./layout.html" %} {% block title %}Statements{% endblock %} {% block content %}
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Search Statements</h3>
+            </div>
+            <div class="panel-body">
+                <form action="/statement/{{userId}}" method="get" role="search">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search notes" name="search" value="{{searchTerm}}" />
+                    </div>
+                    <button type="submit" class="btn btn-default">Search</button>
+                </form>
+                {% if searchTerm %}
+                <p class="help-block">Showing results for: {{searchTerm}}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Export a New Statement</h3>
+            </div>
+            <div class="panel-body">
+                <form action="/statement/{{userId}}/export" method="post">
+                    <div class="form-group">
+                        <label>File name</label>
+                        <input type="text" class="form-control" name="fileName" placeholder="e.g. august-2026" />
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea class="form-control" name="notes" placeholder="Notes to include on this statement"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Generate Statement</button>
+                </form>
+            </div>
+        </div>
+
+        {% for statement in statements %}
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <strong>{{statement.fileName}}</strong> &mdash; {{statement.timestamp}}
+            </div>
+            <div class="panel-body">
+                <p>{{statement.notes}}</p>
+                <a class="btn btn-sm btn-default" href="/statement/{{userId}}/download/{{statement.fileName}}">Download</a>
+                <a class="btn btn-sm btn-danger" href="/statement/{{userId}}/delete/{{statement.fileName}}">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

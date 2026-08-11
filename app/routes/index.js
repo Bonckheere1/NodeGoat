@@ -6,6 +6,7 @@ const AllocationsHandler = require("./allocations");
 const MemosHandler = require("./memos");
 const ResearchHandler = require("./research");
 const ReportsHandler = require("./reports");
+const StatementHandler = require("./statement");
 const tutorialRouter = require("./tutorial");
 const ErrorHandler = require("./error").errorHandler;
 
@@ -21,6 +22,7 @@ const index = (app, db) => {
     const memosHandler = new MemosHandler(db);
     const researchHandler = new ResearchHandler(db);
     const reportsHandler = new ReportsHandler();
+    const statementHandler = new StatementHandler(db);
 
     // Middleware to check if a user is logged in
     const isLoggedIn = sessionHandler.isLoggedInMiddleware;
@@ -80,6 +82,12 @@ const index = (app, db) => {
     // Reports Page - A1: SQL Injection via SQLite string concatenation
     app.get("/reports", isLoggedIn, reportsHandler.searchEmployees);
     app.get("/reports/employee/:id", isLoggedIn, reportsHandler.getEmployee);
+
+    // Statements Page - export/download/delete account statements
+    app.get("/statement/:userId", isLoggedIn, statementHandler.displayStatement);
+    app.post("/statement/:userId/export", isLoggedIn, statementHandler.handleExportRequest);
+    app.get("/statement/:userId/download/:fileName", isLoggedIn, statementHandler.downloadStatement);
+    app.get("/statement/:userId/delete/:fileName", isLoggedIn, statementHandler.deleteStatement);
 
     // Mount tutorial router
     app.use("/tutorial", tutorialRouter);

@@ -29,3 +29,6 @@ test/e2e/videos/
 
 # ignore Snyk Code scanner files
 .dccache
+
+# generated statement export files (see app/utils/statement-export.js)
+app/data/exports/
